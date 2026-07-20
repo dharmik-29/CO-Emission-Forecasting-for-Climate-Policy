@@ -5,7 +5,7 @@
 > evidence-based climate policy.
 
 <!-- Badges: these become live once CI and the demo exist (Week 6).
-[![CI](https://github.com/dharmikdave29/co2-emission-forecasting/actions/workflows/ci.yml/badge.svg)](../../actions)
+[![CI](https://github.com/dharmik-29/co2-emission-forecasting/actions/workflows/ci.yml/badge.svg)](../../actions)
 [![Live Demo](https://img.shields.io/badge/demo-streamlit-red)](YOUR_APP_URL)
 -->
 ![Python](https://img.shields.io/badge/python-3.11+-blue)
@@ -150,6 +150,6 @@ python src/data/download.py   # fetch datasets
 ## 👤 Author
 
 **Dharmik Dave** — MSc E-Government, University of Koblenz
-[Portfolio](https://your-site.com) · [LinkedIn](https://linkedin.com/in/your-profile) · [GitHub](https://github.com/dharmikdave29)
+[Portfolio](https://your-site.com) · [LinkedIn](https://linkedin.com/in/your-profile) · [GitHub](https://github.com/dharmik-29)
 
 Licensed under the [MIT License](LICENSE).
