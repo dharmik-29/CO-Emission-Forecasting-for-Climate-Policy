@@ -115,23 +115,34 @@ cross-validation — never random splits, which would leak future data.
 
 ## 🚀 Setup
 
-```bash
-git clone https://github.com/dharmik-29/co2-emission-forecasting.git
-cd co2-emission-forecasting
+**Prerequisites**
+- SQL Server (this project is pre-configured for `localhost\SQLEXPRESS01`)
+- [ODBC Driver 17 (or 18) for SQL Server](https://learn.microsoft.com/sql/connect/odbc/download-odbc-driver-for-sql-server)
+- Python 3.11+
+
+```powershell
+cd "C:\Dharmik\projects\PAM CO2 project"
 python -m venv .venv
-.venv\Scripts\activate        # Windows  (Linux/Mac: source .venv/bin/activate)
+.venv\Scripts\activate
 pip install -r requirements.txt
-python src/data/download.py   # fetch datasets
+python main.py          # runs the whole pipeline end to end
 ```
+
+`main.py` connects to your SQL Server using Windows Authentication, **creates
+the `PAM_CO2` database automatically**, loads the Carbon Monitor data (bundled
+in `data/raw/`), runs the SQL analysis, and trains all models. No manual database
+setup and no script edits are needed.
+
+To forecast a different country, change `TARGET_COUNTRY` in `src/config.py`.
 
 ---
 
 ## 🗺️ Roadmap
 
 - [x] **Week 1** — Repo setup, data acquisition, EDA
-- [ ] **Week 2** — SQL schema, ETL pipeline, analytical queries
-- [ ] **Week 3** — ARIMA baseline with diagnostics
-- [ ] **Week 4** — RF, Gradient Boosting, XGBoost + TimeSeriesSplit CV
+- [x] **Week 2** — SQL schema, ETL pipeline, analytical queries
+- [x] **Week 3** — ARIMA baseline with diagnostics
+- [x] **Week 4** — RF, Gradient Boosting, XGBoost + TimeSeriesSplit CV
 - [ ] **Week 5** — Model comparison, SHAP, Power BI dashboard
 - [ ] **Week 6** — Streamlit app, CI, Docker
 - [ ] **Week 7** — Polish, write-up, live demo
@@ -150,6 +161,6 @@ python src/data/download.py   # fetch datasets
 ## 👤 Author
 
 **Dharmik Dave** — MSc E-Government, University of Koblenz
-[Portfolio](https://your-site.com) · [LinkedIn](https://linkedin.com/in/your-profile) · [GitHub](https://github.com/dharmik-29)
+ · [LinkedIn](https://linkedin.com/in/your-profile) · [GitHub](https://github.com/dharmik-29)
 
 Licensed under the [MIT License](LICENSE).
