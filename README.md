@@ -161,6 +161,6 @@ To forecast a different country, change `TARGET_COUNTRY` in `src/config.py`.
 ## 👤 Author
 
 **Dharmik Dave** — MSc E-Government, University of Koblenz
- · [LinkedIn](https://linkedin.com/in/your-profile) · [GitHub](https://github.com/dharmik-29)
+ · [LinkedIn]([https://linkedin.com/in/dharmik-dave-29bb4517) · [GitHub](https://github.com/dharmik-29)
 
 Licensed under the [MIT License](LICENSE).
