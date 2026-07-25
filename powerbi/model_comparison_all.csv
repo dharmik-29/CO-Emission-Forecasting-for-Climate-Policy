@@ -1,0 +1,28 @@
+model,R2,RMSE,MAE,MAPE,country
+"ARIMA(1, 1, 2)",-0.0741,4.0987,3.5013,11.0791,China
+RandomForest,0.896,1.2786,1.0041,3.1175,China
+GradientBoosting,0.8766,1.3928,1.0733,3.3448,China
+"ARIMA(2, 1, 2)",-0.1927,2.1039,1.7693,13.4817,United States
+RandomForest,0.6971,1.0606,0.8426,6.3055,United States
+GradientBoosting,0.6256,1.1791,0.9106,6.6836,United States
+"ARIMA(2, 1, 2)",-1.9731,0.9273,0.796,8.0486,India
+RandomForest,0.0087,0.5345,0.3736,3.8289,India
+GradientBoosting,0.0076,0.5348,0.3738,3.8457,India
+"ARIMA(2, 1, 1)",-1.2058,1.5777,1.301,19.9916,EU27
+RandomForest,0.6854,0.5975,0.46,6.4176,EU27
+GradientBoosting,0.708,0.5756,0.4468,6.2369,EU27
+"ARIMA(2, 1, 1)",-0.4625,0.9759,0.7558,16.6269,Russian Federation
+RandomForest,0.9558,0.1699,0.1149,2.1834,Russian Federation
+GradientBoosting,0.9411,0.1961,0.1367,2.5667,Russian Federation
+"ARIMA(2, 1, 2)",-0.3759,0.7476,0.6068,26.7833,Japan
+RandomForest,0.8497,0.2475,0.1888,7.0592,Japan
+GradientBoosting,0.8497,0.2475,0.1918,7.0674,Japan
+"ARIMA(2, 1, 2)",-0.204,0.2632,0.2045,17.8046,Brazil
+RandomForest,0.6156,0.1491,0.1109,9.1073,Brazil
+GradientBoosting,0.6164,0.149,0.113,9.2306,Brazil
+"ARIMA(2, 1, 1)",-0.2363,0.2085,0.1702,18.4971,United Kingdom
+RandomForest,0.3746,0.1487,0.1102,11.12,United Kingdom
+GradientBoosting,0.364,0.1499,0.1093,10.9488,United Kingdom
+"ARIMA(2, 1, 1)",-0.4829,2.392,1.9454,6.376,ROW
+RandomForest,0.7615,0.9607,0.7403,2.3438,ROW
+GradientBoosting,0.759,0.9657,0.7511,2.383,ROW
