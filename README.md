@@ -1,166 +1,184 @@
 # 🌍 CO₂ Emission Forecasting for Climate Policy
 
-> Benchmarking statistical and machine learning models on daily CO₂ emissions —
-> replicating a 2025 peer-reviewed study and assessing which models best support
-> evidence-based climate policy.
+> An end-to-end data science project that forecasts daily CO₂ emissions across 9
+> world regions and evaluates which model best supports evidence-based climate
+> policy — built on real [Carbon Monitor](https://carbonmonitor.org) data and
+> replicating the benchmark of Ajala et al. (2025).
 
-<!-- Badges: these become live once CI and the demo exist (Week 6).
-[![CI](https://github.com/dharmik-29/co2-emission-forecasting/actions/workflows/ci.yml/badge.svg)](../../actions)
-[![Live Demo](https://img.shields.io/badge/demo-streamlit-red)](YOUR_APP_URL)
--->
-![Python](https://img.shields.io/badge/python-3.11+-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
-![Status](https://img.shields.io/badge/status-week%201%20of%207-orange)
+![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)
+![SQL Server](https://img.shields.io/badge/SQL%20Server-2022-CC2927?logo=microsoftsqlserver&logoColor=white)
+![Power BI](https://img.shields.io/badge/Power%20BI-dashboard-F2C811?logo=powerbi&logoColor=black)
+![Streamlit](https://img.shields.io/badge/Streamlit-app-FF4B4B?logo=streamlit&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green)
 
 ---
 
 ## 📌 Overview
 
-Accurate short-term CO₂ forecasts help governments set emission targets and
-evaluate interventions. This project asks: **which forecasting approach should a
-policy analyst actually use?**
+Governments set climate targets using emission data that often arrives yearly and
+late. This project asks a practical question: **which forecasting method should a
+policy analyst actually use for near-real-time daily CO₂?**
 
-It replicates and extends *Ajala et al. (2025)* — a comparison of statistical,
-machine learning, and deep learning models for daily CO₂ prediction — using
-publicly available [Carbon Monitor](https://carbonmonitor.org) data for
-**China, India, USA, and EU27+UK**.
+It builds a complete, reproducible pipeline — raw data → SQL Server → machine
+learning → dashboard → live web app — and benchmarks statistical against machine
+learning models on daily Carbon Monitor data for **China, the United States,
+India, EU27, Russia, Japan, Brazil, the United Kingdom, and the Rest of World**.
 
 ### Research questions
 
-| # | Question |
-|---|----------|
-| RQ1 | Can published forecasting results be replicated using publicly available datasets? |
-| RQ2 | Which forecasting approach is most suitable for policy analysis and decision support? |
-| RQ3 | What trade-offs exist between accuracy, interpretability, and computational complexity? |
+| # | Question | Finding |
+|---|----------|---------|
+| RQ1 | Can published results be replicated on public data? | **Yes** — Random Forest reached R² = 0.90, matching the ~0.92 benchmark |
+| RQ2 | Which approach best supports policy decisions? | **Machine learning + SHAP** — accurate *and* explainable |
+| RQ3 | What are the accuracy / interpretability / cost trade-offs? | ARIMA simplest but weakest; boosting accurate but heavier; **Random Forest is the sweet spot** |
+
+---
+
+## 📈 Key results
+
+Forecasting **China's** daily emissions (Jan 2024 – May 2026) on a chronological
+20% hold-out set:
+
+| Model | R² | RMSE | MAE | MAPE |
+|-------|-----|------|-----|------|
+| ARIMA | −0.07 | 4.10 | 3.50 | 11.1% |
+| **Random Forest** ⭐ | **0.896** | 1.28 | 1.00 | 3.1% |
+| Gradient Boosting | 0.877 | 1.39 | 1.07 | 3.3% |
+
+Both machine-learning models clearly beat the ARIMA baseline. **SHAP** analysis
+shows the previous day's emissions (`lag_1`) overwhelmingly drive the forecast —
+making the model both accurate and interpretable for short-term policy monitoring.
+
+**Data insight:** across the 9 regions (~91,300 MtCO₂ total), China is the largest
+emitter (~29,200 MtCO₂), followed by the Rest of World (~27,400). By sector,
+**Power (36%) and Industry (33%)** together make up roughly **69%** of global
+emissions — the sectors policy should target first.
+
+---
+
+## 📊 Power BI dashboard
+
+An interactive 3-page dashboard built on the model outputs.
+
+**Global overview** — world map, country ranking, and headline KPIs:
+
+![Overview page](powerbi/overview.png)
+
+**Sector analysis** — sector shares over time and overall breakdown:
+
+![Sectors page](powerbi/sectors.png)
+
+**Model performance** — accuracy comparison, forecast vs actual, and SHAP drivers:
+
+![Model performance page](powerbi/model%20performance.png)
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-Carbon Monitor / OWID  ──▶  Python ETL  ──▶  SQL database (PostgreSQL/SQLite)
-                                                   │
-                              ┌────────────────────┼──────────────────┐
-                              ▼                    ▼                  ▼
-                        ARIMA baseline      RF / GB / XGBoost    Power BI dashboard
-                        (statsmodels)       (scikit-learn)       (policy view)
-                              │                    │
-                              └────────┬───────────┘
-                                       ▼
-                         Evaluation: R² · RMSE · MAE · MAPE
-                                       ▼
-                            Streamlit forecast explorer
+Carbon Monitor Excel
+        │  download.py  (clean & tidy)
+        ▼
+   SQL Server  ──►  analytical SQL  ──►  rankings & insights
+ (PAM_CO2 DB)               │
+        │  build_features.py│
+        ▼                   ▼
+   ARIMA (statsmodels)   RF / GB / XGBoost (scikit-learn)
+        └──────────┬────────┘
+                   ▼
+      Evaluation: R² · RMSE · MAE · MAPE  +  SHAP
+                   ▼
+     Power BI dashboard   +   Streamlit web app
 ```
 
----
-
-## 📊 Data
-
-| Source | Granularity | Used for |
-|--------|------------|----------|
-| [Carbon Monitor](https://carbonmonitor.org) | Daily, by country & sector, 2019– | Primary modeling dataset |
-| [Our World in Data](https://github.com/owid/co2-data) | Annual, by country | Context & socioeconomic features |
-
-Data is **not stored in this repo** — run `src/data/download.py` to fetch it
-(reproducibility over bundled CSVs).
+Every stage is a separate, testable Python module. `main.py` runs the whole
+pipeline with a single command.
 
 ---
 
-## 🤖 Models
+## 🧰 Tech stack
 
-| Model | Type | Why it's here |
-|-------|------|---------------|
-| ARIMA / SARIMA | Statistical | Interpretable baseline; the policy-world standard |
-| Random Forest | ML (bagging) | Non-linear patterns, built-in feature importance |
-| Gradient Boosting | ML (boosting) | Top published accuracy (R² > 0.93 in Ajala et al.) |
-| XGBoost | ML (boosting) | Modern industry-standard variant |
-
-Evaluation uses a **chronological 80/20 split** and `TimeSeriesSplit`
-cross-validation — never random splits, which would leak future data.
-
----
-
-## 📈 Results
-
-> 🚧 Coming in Week 5. Target benchmarks from the literature:
-> ARIMA R² ≈ 0.72 · Random Forest R² ≈ 0.92 · Gradient Boosting R² > 0.93
-
-| Model | R² | RMSE | MAE | MAPE |
-|-------|----|------|-----|------|
-| ARIMA | – | – | – | – |
-| Random Forest | – | – | – | – |
-| Gradient Boosting | – | – | – | – |
-| XGBoost | – | – | – | – |
+**Python** · **SQL Server** (T-SQL, SQLAlchemy, pyodbc) · **scikit-learn** ·
+**statsmodels** · **XGBoost** · **SHAP** · **Power BI** · **Streamlit** ·
+**Docker** · **GitHub Actions (CI)** · **pytest**
 
 ---
 
 ## 📁 Repository structure
 
 ```
-├── data/            # raw & processed data (gitignored, created by scripts)
-├── sql/             # schema + analytical queries
-├── notebooks/       # EDA and model exploration
-├── src/
-│   ├── data/        # download.py, etl.py
-│   ├── features/    # lag & calendar feature engineering
-│   ├── models/      # arima_model.py, ml_models.py, evaluate.py
-│   └── visualization/
-├── app/             # Streamlit app
-├── powerbi/         # dashboard + screenshots
-├── reports/figures/ # generated plots
-└── tests/           # pytest unit tests
+co2-emission-forecasting/
+├─ data/raw/            Carbon Monitor Excel (source data)
+├─ sql/                 schema.sql · analysis_queries.sql · comparison_queries.sql
+├─ src/
+│   ├─ data/            download.py · etl.py · db.py · queries.py
+│   ├─ features/        build_features.py
+│   ├─ models/          arima_model.py · ml_models.py · evaluate.py
+│   ├─ reporting/       powerbi_export.py  (+ SHAP)
+│   └─ visualization/   plots.py
+├─ app/                 streamlit_app.py   (interactive web app)
+├─ powerbi/             dashboard, CSVs & build guide
+├─ tests/               test_pipeline.py
+├─ main.py              runs the full pipeline
+├─ Dockerfile           containerises the app
+├─ .github/workflows/   ci.yml  (tests on every push)
+└─ requirements.txt
 ```
 
 ---
 
-## 🚀 Setup
+## 🚀 Quick start
 
-**Prerequisites**
-- SQL Server (this project is pre-configured for `localhost\SQLEXPRESS01`)
-- [ODBC Driver 17 (or 18) for SQL Server](https://learn.microsoft.com/sql/connect/odbc/download-odbc-driver-for-sql-server)
-- Python 3.11+
+**Prerequisites:** SQL Server (e.g. `localhost\SQLEXPRESS01`), the
+[ODBC Driver for SQL Server](https://learn.microsoft.com/sql/connect/odbc/download-odbc-driver-for-sql-server),
+and Python 3.11+.
 
-```powershell
-cd "C:\Dharmik\projects\PAM CO2 project"
-python -m venv .venv
-.venv\Scripts\activate
+```bash
+git clone https://github.com/dharmik-29/co2-emission-forecasting.git
+cd co2-emission-forecasting
+python -m venv .venv ; .venv\Scripts\activate
 pip install -r requirements.txt
-python main.py          # runs the whole pipeline end to end
+
+python main.py                          # full pipeline: SQL Server + models
+python -m src.reporting.powerbi_export  # dashboard CSVs + SHAP
+streamlit run app/streamlit_app.py      # interactive web app
 ```
 
-`main.py` connects to your SQL Server using Windows Authentication, **creates
-the `PAM_CO2` database automatically**, loads the Carbon Monitor data (bundled
-in `data/raw/`), runs the SQL analysis, and trains all models. No manual database
-setup and no script edits are needed.
-
-To forecast a different country, change `TARGET_COUNTRY` in `src/config.py`.
+`main.py` connects with Windows Authentication and **creates the `PAM_CO2`
+database automatically** — no manual database setup. Change `TARGET_COUNTRY` in
+`src/config.py` to model a different country.
 
 ---
 
-## 🗺️ Roadmap
+## ✅ Project phases (complete)
 
-- [x] **Week 1** — Repo setup, data acquisition, EDA
-- [x] **Week 2** — SQL schema, ETL pipeline, analytical queries
-- [x] **Week 3** — ARIMA baseline with diagnostics
-- [x] **Week 4** — RF, Gradient Boosting, XGBoost + TimeSeriesSplit CV
-- [ ] **Week 5** — Model comparison, SHAP, Power BI dashboard
-- [ ] **Week 6** — Streamlit app, CI, Docker
-- [ ] **Week 7** — Polish, write-up, live demo
+- [x] Repository setup, data acquisition & exploratory analysis
+- [x] SQL Server schema, ETL pipeline & analytical queries
+- [x] ARIMA baseline with stationarity diagnostics
+- [x] Random Forest, Gradient Boosting & XGBoost
+- [x] Model comparison, SHAP interpretability & Power BI dashboard
+- [x] Streamlit web app, Docker & CI
+- [x] Documentation, write-up & live demo
 
 ---
 
-## 📚 Key references
+## 📚 Reference
 
-- Ajala, M. A., et al. (2025). *Daily CO₂ emissions prediction: ML, DL & statistical models.* Science and Technology for Energy Transition.
-- Li, X. (2023). *Comparative study of statistical and ML models on near-real-time daily CO₂ prediction.* arXiv:2302.01152.
-- Ulussever, T., et al. (2023). *ML vs time-series econometric models for sector-based CO₂ in the USA.* Environ. Sci. Pollut. Res.
-- Giannelos, S., et al. (2024). *ML approaches for CO₂ predictions in the building sector.* Electric Power Systems Research.
+Ajala, M. A., et al. (2025). *Daily CO₂ emissions prediction: machine learning,
+deep learning and statistical models.* Science and Technology for Energy
+Transition. — *primary replication target.*
+
+Data: [carbonmonitor.org](https://carbonmonitor.org)
 
 ---
 
 ## 👤 Author
 
 **Dharmik Dave** — MSc E-Government, University of Koblenz
- · [LinkedIn](https://linkedin.com/in/dharmik-dave-29bb4517) · [GitHub](https://github.com/dharmik-29)
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-connect-0A66C2?logo=linkedin&logoColor=white)](https://www.linkedin.com/in/dharmik-dave-29bb45170)
+[![GitHub](https://img.shields.io/badge/GitHub-dharmik--29-181717?logo=github&logoColor=white)](https://github.com/dharmik-29)
+[![Portfolio](https://img.shields.io/badge/Portfolio-website-2ea44f)](https://dharmik-dave.netlify.app/)
 
 Licensed under the [MIT License](LICENSE).
