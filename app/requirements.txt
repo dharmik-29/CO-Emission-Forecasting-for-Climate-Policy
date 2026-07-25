@@ -1,0 +1,5 @@
+# Dependencies for the Streamlit app only (used by the Dockerfile and by
+# Streamlit Community Cloud). Kept separate from the main requirements.txt so
+# the deployed app stays lightweight (no SQL Server / pyodbc needed).
+streamlit>=1.30
+pandas>=2.0
